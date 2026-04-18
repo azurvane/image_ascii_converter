@@ -1,0 +1,30 @@
+notes/
+.venv/
+library/
+
+
+# --- Build Artifacts ---
+# This is the big one. Exclude all CMake build folders.
+cmake-build-*/
+build/
+out/
+
+# --- IDE Specific (JetBrains/CLion) ---
+# These are local settings that shouldn't be shared with others.
+.idea/
+cmake-build-debug/
+cmake-build-release/
+
+# --- OS Specific ---
+# Random junk files created by your operating system
+.DS_Store
+Thumbs.db
+
+# --- Executables ---
+# Ignore the actual compiled program (like your 'imageinfo' file)
+# This prevents you from pushing binary files to GitHub
+imageinfo
+imageinfo.exe
+*.exe
+*.out
+*.app
