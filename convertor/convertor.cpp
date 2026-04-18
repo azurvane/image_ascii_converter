@@ -21,6 +21,10 @@ convertor::convertor() {
 }
 
 convertor::convertor(const string& path) {
+    data=nullptr;
+    width=0;
+    height=0;
+    channels=0;
     loadImage(path);
 }
 
