@@ -1,7 +1,3 @@
-//
-// Created by azurvane on 18/04/26.
-//
-
 #ifndef CONVERTOR_H
 #define CONVERTOR_H
 
@@ -11,7 +7,6 @@ using namespace std;
 
 
 class Convertor {
-private:
     const string RAMP = "@#S%?*+;:,. ";
     const int N = RAMP.size();
     int width, height, channels;
@@ -19,10 +14,15 @@ private:
     string path;
     int cols = 176;
     int blockW, blockH, rows;
+    std::vector<uint8_t> gray;
 
 
     uint8_t toGray(uint8_t R, uint8_t G, uint8_t B);
     char toChar(uint8_t gray);
+    void ToGrayVector();
+    pair<float, float> sobelAt(int px, int py);
+    char directionChar(float angle);
+
     void loadImage();
 
 
