@@ -6,7 +6,6 @@
 #define CONVERTOR_H
 
 #include <iostream>
-#include "../library/stb_image.h"
 
 using namespace std;
 

@@ -1,5 +1,6 @@
 #include "convertor.h"
 #include <iostream>
+#define STB_IMAGE_IMPLEMENTATION
 #include "../library/stb_image.h"
 
 using namespace std;
