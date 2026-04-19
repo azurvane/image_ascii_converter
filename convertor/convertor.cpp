@@ -19,13 +19,12 @@ Convertor::Convertor() {
     width=0;
     height=0;
     channels=0;
+    blockW=0;
+    blockH=0;
+    rows=0;
 }
 
 Convertor::Convertor(const string& inputPath) {
-    data=nullptr;
-    width=0;
-    height=0;
-    channels=0;
     path = inputPath;
     loadImage();
 }
@@ -43,6 +42,8 @@ void Convertor::loadImage() {
         3
         );
 
+    setRes();
+
     if (!data) {
         cout << "Failed to load image: " << "\n";
         return;
@@ -53,11 +54,23 @@ void Convertor::loadImage() {
          << "image channels: " << channels << endl;
 }
 
-void Convertor::pathChange(const string &inputPath) {
-    path = inputPath;
+void Convertor::pathChange(const string &input_path) {
+    path = input_path;
     loadImage();
 }
 
+void Convertor::setRes(int new_cols) {
+    if (new_cols < 0) {
+        blockW = width / cols;
+        blockH = blockW * 2;
+        rows = height / blockH;
+    }
+
+    cols = new_cols;
+    blockW = width / cols;
+    blockH = blockW * 2;
+    rows = height / blockH;
+}
 
 void Convertor::imageAscii() {
     if (!data) {
@@ -65,12 +78,20 @@ void Convertor::imageAscii() {
         return;
     }
 
-    for (int row=0; row<height; row++) {
-        for (int col=0; col<width; col++) {
-            int i = (row * width + col) * 3;
-            uint8_t R = data[i], G = data[i+1], B = data[i+2];
-            uint8_t gray = toGray(R, G, B);
-            cout << toChar(gray);
+    for (int row=0; row<rows; row++) {
+        for (int col=0; col<cols; col++) {
+            int sum=0;
+            for (int dy=0; dy<blockH; dy++) {
+                for (int dx=0; dx<blockW; dx++) {
+                    int px = col * blockW + dx;
+                    int py = row * blockH + dy;
+                    if (px >= width || py >= height) continue;
+                    int i = (py * width + px) * 3;
+                    sum += toGray(data[i], data[i+1], data[i+2]);
+                }
+            }
+            uint8_t avg = sum/(blockW * blockH);
+            cout << toChar(avg);
         }
         cout << "\n";
     }

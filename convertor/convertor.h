@@ -17,6 +17,8 @@ private:
     int width, height, channels;
     unsigned char* data;
     string path;
+    int cols = 176;
+    int blockW, blockH, rows;
 
 
     uint8_t toGray(uint8_t R, uint8_t G, uint8_t B);
@@ -27,7 +29,8 @@ private:
 public:
     Convertor();
     Convertor(const string& inputPath);
-    void pathChange(const string& inputPath);
+    void pathChange(const string& input_path);
+    void setRes(int new_cols=-1);
     void imageAscii();
 
     ~Convertor();
