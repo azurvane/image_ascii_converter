@@ -11,23 +11,27 @@
 using namespace std;
 
 
-class convertor {
+class Convertor {
 private:
     const string RAMP = "@#S%?*+;:,. ";
     const int N = RAMP.size();
     int width, height, channels;
     unsigned char* data;
+    string path;
+
+
     uint8_t toGray(uint8_t R, uint8_t G, uint8_t B);
     char toChar(uint8_t gray);
-    void loadImage(const string& path);
+    void loadImage();
 
 
 public:
-    convertor();
-    convertor(const string& path);
-    void image_ascii();
+    Convertor();
+    Convertor(const string& inputPath);
+    void pathChange(const string& inputPath);
+    void imageAscii();
 
-    ~convertor();
+    ~Convertor();
 };
 
 

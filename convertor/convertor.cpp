@@ -4,32 +4,33 @@
 
 using namespace std;
 
-uint8_t convertor::toGray(uint8_t R, uint8_t G, uint8_t B) {
+uint8_t Convertor::toGray(uint8_t R, uint8_t G, uint8_t B) {
     return (R*299 + G*587 + B*114) / 1000;
 }
 
-char convertor::toChar(uint8_t gray) {
+char Convertor::toChar(uint8_t gray) {
     int index = (gray * (N - 1)) / 255;
     return RAMP[index];
 }
 
-convertor::convertor() {
+Convertor::Convertor() {
     data=nullptr;
     width=0;
     height=0;
     channels=0;
 }
 
-convertor::convertor(const string& path) {
+Convertor::Convertor(const string& inputPath) {
     data=nullptr;
     width=0;
     height=0;
     channels=0;
-    loadImage(path);
+    path = inputPath;
+    loadImage();
 }
 
 
-void convertor::loadImage(const string& path) {
+void Convertor::loadImage() {
     if (data != nullptr)
         stbi_image_free(data);
 
@@ -51,8 +52,18 @@ void convertor::loadImage(const string& path) {
          << "image channels: " << channels << endl;
 }
 
+void Convertor::pathChange(const string &inputPath) {
+    path = inputPath;
+    loadImage();
+}
 
-void convertor::image_ascii() {
+
+void Convertor::imageAscii() {
+    if (!data) {
+        cout << "data was loaded\n";
+        return;
+    }
+
     for (int row=0; row<height; row++) {
         for (int col=0; col<width; col++) {
             int i = (row * width + col) * 3;
@@ -64,7 +75,7 @@ void convertor::image_ascii() {
     }
 }
 
-convertor::~convertor() {
+Convertor::~Convertor() {
     stbi_image_free(data);
 }
 
