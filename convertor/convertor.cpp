@@ -46,7 +46,7 @@ pair<float, float> Convertor::sobelAt(int px, int py) {
 
 char Convertor::directionChar(float angle) {
     float deg = angle * (180.0f / numbers::pi_v<float>);
-    float a = std::abs(deg);
+    float a = abs(deg);
 
     if (a <= 22.5f || a >= 157.5f)  return '-';
     if (a >= 67.5f && a <= 112.5f)  return '|';
@@ -117,36 +117,69 @@ void Convertor::setRes(int new_cols) {
     rows = height / blockH;
 }
 
+uint8_t Convertor::avgGray(int row, int col) {
+    int sum=0;
+    int count=0;
+    for (int dy=0; dy<blockH; dy++) {
+        for (int dx=0; dx<blockW; dx++) {
+            int px = col * blockW + dx;
+            int py = row * blockH + dy;
+            if (px >= width || py >= height) continue;
+            int i = py * width + px;
+            sum += gray[i];
+            count++;
+        }
+    }
+    return sum/count;
+}
+
+vector<float> Convertor::calErrorBuf(vector<float> errorBuf, float adjusted, int row, int col) {
+    int charIndex = static_cast<uint8_t>(adjusted) * (N - 1) / 255;
+    int actualBrightness = (charIndex * 255) / (N - 1);
+    float error = adjusted - static_cast<float>(actualBrightness);
+
+    if (col + 1 < cols)
+        errorBuf[row * cols + (col+1)] += error * 7.0f / 16.0f;
+    if (row + 1 < rows) {
+        if (col - 1 >= 0)
+            errorBuf[(row+1) * cols + (col-1)] += error * 3.0f / 16.0f;
+        errorBuf[(row+1) * cols + col] += error * 5.0f / 16.0f;
+        if (col + 1 < cols)
+            errorBuf[(row+1) * cols + (col+1)] += error * 1.0f / 16.0f;
+    }
+
+    return errorBuf;
+}
+
 void Convertor::imageAscii() {
     if (!data) {
         cout << "data was loaded\n";
         return;
     }
+
     float threshold = 50.0f;
+    vector errorBuf(rows * cols, 0.0f);
 
     for (int row=0; row<rows; row++) {
         for (int col=0; col<cols; col++) {
-            int sum=0;
-            for (int dy=0; dy<blockH; dy++) {
-                for (int dx=0; dx<blockW; dx++) {
-                    int px = col * blockW + dx;
-                    int py = row * blockH + dy;
-                    if (px >= width || py >= height) continue;
-                    int i = py * width + px;
-                    sum += gray[i];
-                }
-            }
-            uint8_t avg = sum/(blockW * blockH);
+
+            uint8_t avg = avgGray(row, col);
+
+            float adjusted = static_cast<float>(avg) + errorBuf[row * cols + col];
+            adjusted = clamp(adjusted, 0.0f, 255.0f);
+
             int cx = col * blockW + blockW / 2;
             int cy = row * blockH + blockH / 2;
             auto [gx, gy] = sobelAt(cx, cy);
-            float magnitude = std::sqrt(gx*gx + gy*gy);
+            float magnitude = sqrt(gx*gx + gy*gy);
+
             if (magnitude > threshold) {
-                float angle = std::atan2(gy, gx);
+                float angle = atan2(gy, gx);
                 cout << directionChar(angle);
             }
             else {
-                cout << toChar(avg);
+                cout << toChar(static_cast<uint8_t>(adjusted));
+                errorBuf = calErrorBuf(errorBuf, adjusted, row, col);
             }
         }
         cout << "\n";
